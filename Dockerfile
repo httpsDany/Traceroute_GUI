@@ -1,18 +1,15 @@
-FROM python:3.11-slim
+FROM jenkins/jenkins:lts
 
-# Install deps for geopandas
-RUN apt-get update && apt-get install -y \
-    gdal-bin \
-    libgdal-dev \
-    && rm -rf /var/lib/apt/lists/*
+USER root
 
-WORKDIR /app
+# Install Docker CLI inside Jenkins
+RUN apt-get update && \
+    apt-get install -y docker.io && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Add jenkins user to docker group (ignore if group exists)
+RUN groupadd -f docker && \
+    usermod -aG docker jenkins
 
-# Copy app and naturalearth data
-COPY . .
-
-CMD ["python", "wireframe.py"]
+USER jenkins
 
