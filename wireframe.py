@@ -4,9 +4,7 @@ import plotly.graph_objects as go
 import subprocess, re, requests
 from dash import Dash, dcc, html, Input, Output
 
-# ---------------------------
 # Convert lon/lat to 3D coords
-# ---------------------------
 def lonlat_to_xyz(lon, lat, R=1.02):
     lon, lat = np.radians(lon), np.radians(lat)
     x = R * np.cos(lat) * np.cos(lon)
@@ -14,9 +12,7 @@ def lonlat_to_xyz(lon, lat, R=1.02):
     z = R * np.sin(lat)
     return x, y, z
 
-# ---------------------------
-# Create black occlusion sphere
-# ---------------------------
+# Create black small sphere to hide the opposite side wireframe
 def create_black_sphere(R=1, steps=100):
     u = np.linspace(0, 2*np.pi, steps)
     v = np.linspace(-np.pi/2, np.pi/2, steps)
@@ -32,9 +28,7 @@ def create_black_sphere(R=1, steps=100):
         hoverinfo="skip"   # disable hover on globe
     )
 
-# ---------------------------
 # Load Natural Earth borders
-# ---------------------------
 world = gpd.read_file("110m_cultural/ne_110m_admin_0_countries.shp")
 
 def base_globe():
@@ -65,9 +59,7 @@ def base_globe():
     )
     return fig
 
-# ---------------------------
 # Geolocate an IP
-# ---------------------------
 def geolocate_ip(ip):
     try:
         r = requests.get(f"http://ip-api.com/json/{ip}", timeout=5)
@@ -78,9 +70,7 @@ def geolocate_ip(ip):
         return None
     return None
 
-# ---------------------------
 # Run traceroute & map hops
-# ---------------------------
 def run_traceroute_with_geo(ip_address):
     result = subprocess.run(["traceroute", "-n", ip_address],
                             capture_output=True, text=True)
@@ -94,9 +84,7 @@ def run_traceroute_with_geo(ip_address):
                 hops.append((hop_ip, loc))  # (ip, (lon, lat, city))
     return hops
 
-# ---------------------------
 # Great-circle helper
-# ---------------------------
 def great_circle_arc(lon1, lat1, lon2, lat2, n_points=50, R=1.05):
     lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
     x1, y1, z1 = np.cos(lat1)*np.cos(lon1), np.cos(lat1)*np.sin(lon1), np.sin(lat1)
@@ -115,9 +103,7 @@ def great_circle_arc(lon1, lat1, lon2, lat2, n_points=50, R=1.05):
         arc_points.append((R*x/norm, R*y/norm, R*z/norm))
     return zip(*arc_points)
 
-# ---------------------------
 # Dash app
-# ---------------------------
 app = Dash(__name__)
 
 app.layout = html.Div([
