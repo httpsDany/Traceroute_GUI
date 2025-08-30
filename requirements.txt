@@ -1,0 +1,6 @@
+geopandas
+numpy
+plotly
+dash
+requests
+
